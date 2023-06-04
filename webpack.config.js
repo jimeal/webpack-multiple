@@ -4,9 +4,12 @@ const childProcess = require("child_process");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const apiMocker = require("connect-api-mocker");
 
+const mode = process.env.NODE_ENV || "development"
 module.exports = {
-  mode: "development",
+  //mode: "development",
+  mode,
   entry: {
     main: "./src/app.js"
   },
@@ -17,12 +20,13 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/,
+        test: /\.(scss|css)$/,
         use: [
           process.env.NODE_ENV === "production"
             ? MiniCssExtractPlugin.loader
             : "style-loader",
-          "css-loader"
+          "css-loader",
+          "sass-loader"
         ]
       },
       {
@@ -65,5 +69,21 @@ module.exports = {
     ...(process.env.NODE_ENV === "production"
       ? [new MiniCssExtractPlugin({filename: `[name].css`})]
       : []),
-  ]
+  ],
+  devServer: {
+    contentBase: path.join(__dirname, "dist"),
+    publicPath: "/",
+    host: "localhost",
+    overlay: true,
+    //port: 8081,
+    stats: "errors-only",
+    //historyApiFallback: true
+    before: app => {
+      app.use(apiMocker('/api', 'mocks/api'));
+    },
+    hot: true,
+    // proxy: {
+    //   '/api': "http://localhost:8081"
+    // },
+  }
 }
