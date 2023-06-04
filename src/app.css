@@ -1,0 +1,8 @@
+body {
+  background: url(bg.png);
+}
+.nyan {
+  background: url(nyancat.jpg);
+  width: 100px;
+  height: 100px;
+}
